@@ -1,0 +1,11 @@
+Package: com.huami.wcenhance
+Name: WCEnhance
+Version: 1.0-3
+Description: 仅供学习交流，请在 24 小时内自觉删除。
+Homepage: https://github.com/huami1314
+Section: Tweaks
+Depends: firmware (>= 5.0), mobilesubstrate
+Priority: optional
+Maintainer: huami
+Author: huami
+Architecture: iphoneos-arm
