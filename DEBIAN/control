@@ -1,0 +1,8 @@
+Package: hbbpushfixer
+Name: WeChat Push Fixer
+Version: 1.0.0
+Architecture: iphoneos-arm
+Maintainer: 你的名字 <你的邮箱>
+Description: 修复微信推送的插件
+Section: Tweaks
+Depends: mobilesubstrate, preferenceloader
