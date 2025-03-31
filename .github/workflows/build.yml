@@ -1,5 +1,10 @@
 name: Build dylib
-on: [push, workflow_dispatch]  # 支持推送触发和手动触发
+on: [push, workflow_dispatch]
+
+permissions:
+  contents: read
+  packages: write
+  actions: read
 
 jobs:
   build:
@@ -20,7 +25,7 @@ jobs:
           make package
 
       - name: Upload artifact
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4  # 关键修复：v3 → v4
         with:
           name: WeChatTweak.dylib
           path: .theos/obj/debug/*.dylib
