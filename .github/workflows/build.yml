@@ -1,19 +1,24 @@
 name: Build dylib
 on: [push, workflow_dispatch]
 
-permissions:
-  contents: read
-  packages: write
-  actions: read
-
 jobs:
   build:
     runs-on: macos-latest
     steps:
       - uses: actions/checkout@v4
 
-      - name: Install theos
+      - name: Install dependencies
         run: |
+          # 安装 Xcode 命令行工具
+          xcode-select --install || true
+          
+          # 安装 Homebrew 和 ldid
+          /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
+          echo 'export PATH="/usr/local/bin:$PATH"' >> ~/.bashrc
+          source ~/.bashrc
+          brew install ldid
+
+          # 安装 theos
           git clone --recursive https://github.com/theos/theos.git ~/theos
           echo "export THEOS=~/theos" >> ~/.bashrc
           echo "export PATH=$PATH:~/theos/bin" >> ~/.bashrc
@@ -25,7 +30,9 @@ jobs:
           make package
 
       - name: Upload artifact
-        uses: actions/upload-artifact@v4  # 关键修复：v3 → v4
+        uses: actions/upload-artifact@v4
         with:
-          name: WeChatTweak.dylib
-          path: .theos/obj/debug/*.dylib
+          name: WeChatTweak
+          path: |
+            .theos/obj/debug/*.dylib
+            .theos/obj/debug/*.deb
