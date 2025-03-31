@@ -7,6 +7,7 @@
         <key>Bundles</key>
         <array>
             <string>com.tencent.xin</string>  <!-- 微信的 Bundle ID -->
+            <string>com.apple.springboard</string>  <!-- 主屏幕 -->
         </array>
     </dict>
 </dict>
