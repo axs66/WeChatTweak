@@ -1,21 +1,21 @@
 name: Build dylib
-on: [push, pull_request]  # 确保触发条件包含 push
+on: [push, workflow_dispatch]  # 支持推送触发和手动触发
 
 jobs:
   build:
     runs-on: macos-latest
     steps:
       - uses: actions/checkout@v4
-      
+
       - name: Install theos
         run: |
           git clone --recursive https://github.com/theos/theos.git ~/theos
           echo "export THEOS=~/theos" >> ~/.bashrc
           echo "export PATH=$PATH:~/theos/bin" >> ~/.bashrc
-          source ~/.bashrc
 
       - name: Build tweak
         run: |
+          source ~/.bashrc
           cd $GITHUB_WORKSPACE
           make package
 
