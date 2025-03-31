@@ -1,4 +1,0 @@
-#!/bin/bash
-uicache -p /Library/MobileSubstrate/DynamicLibraries/hbbpushfixer.dylib
-killall -9 WeChat
-exit 0
