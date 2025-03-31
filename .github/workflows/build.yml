@@ -3,7 +3,8 @@ on: [push, workflow_dispatch]
 
 jobs:
   build:
-    runs-on: macos-latest
+    runs-on: [macos-latest, macos-13]  # 多备选运行器
+    timeout-minutes: 30                 # 避免无限等待
     steps:
       - uses: actions/checkout@v4
 
