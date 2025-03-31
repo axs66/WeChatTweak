@@ -7,13 +7,8 @@
         <key>Bundles</key>
         <array>
             <string>com.tencent.xin</string>  <!-- 微信的 Bundle ID -->
-            <string>com.tencent.qy.xin</string>  <!-- 微信的 Bundle ID -->
-            <string>com.tencent.wx</string>  <!-- 微信的 Bundle ID -->
-            <string>com.tencent.mm.xin</string>  <!-- 微信的 Bundle ID -->
+            <string>com.apple.springboard</string>  <!-- 主屏幕 -->
         </array>
     </dict>
-    <!-- 无根越狱需指定动态库路径 -->
-    <key>LibraryPath</key>
-    <string>/var/jb/Library/MobileSubstrate/DynamicLibraries/WeChatTweak.dylib</string>
 </dict>
 </plist>
