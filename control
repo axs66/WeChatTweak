@@ -1,0 +1,9 @@
+Package: com.hbb.wechattweak
+Name: WeChatTweak
+Version: 1.0
+Architecture: iphoneos-arm
+Description: Fix WeChat notification sound
+Maintainer: HBB
+Author: HBB
+Section: Tweaks
+Depends: mobilesubstrate
