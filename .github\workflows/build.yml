@@ -1,0 +1,26 @@
+name: Build dylib
+
+on: [push]
+
+jobs:
+  build:
+    runs-on: macos-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install theos
+        run: |
+          git clone --recursive https://github.com/theos/theos.git
+          export THEOS=~/theos
+          echo "export THEOS=$THEOS" >> ~/.bash_profile
+
+      - name: Build tweak
+        run: |
+          cd $GITHUB_WORKSPACE
+          make package
+
+      - name: Upload artifact
+        uses: actions/upload-artifact@v3
+        with:
+          name: WeChatTweak.dylib
+          path: $GITHUB_WORKSPACE/.theos/obj/debug/*.dylib
