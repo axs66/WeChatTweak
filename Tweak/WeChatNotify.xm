@@ -14,13 +14,13 @@
 - (BOOL)application:(UIApplication *)application didFinishLaunchingWithOptions:(NSDictionary *)launchOptions {
     %orig; // 调用原始实现
 
-    // 仅执行一次的初始化操作，注册默认音频映射
+    // 仅执行一次的初始化操作：注册默认的音频映射
     static dispatch_once_t onceToken;
     dispatch_once(&onceToken, ^{
         [SoundMapper registerDefaultMappings];
     });
 
-    // 输出日志，显示插件已加载以及当前设备的 SDK 版本
+    // 输出日志，显示插件已加载及当前设备的 SDK 版本
     NSLog(@"[WeChatTweak] 插件已加载 | SDK版本: %@", [[UIDevice currentDevice] systemVersion]);
     return YES;
 }
@@ -29,12 +29,12 @@
 
 // --- Hook: NotificationServiceExtension ---
 // 利用 Logos 重写 NotificationServiceExtension 的 didReceiveNotificationRequest:withContentHandler: 方法
-// 主要用于拦截通知并替换通知声音
+// 主要用于拦截通知并替换提示音
 %hook NotificationServiceExtension
 
 - (void)didReceiveNotificationRequest:(UNNotificationRequest *)request 
                    withContentHandler:(void (^)(UNNotificationContent *))contentHandler {
-    
+
     // --- 提取原始提示音 ---
     // 如果 request.content.sound 为 NSString 类型则直接使用，否则使用默认提示音 "default"
     NSString *originalSound = nil;
@@ -72,7 +72,7 @@
         }
     };
     
-    // --- 调用原始方法 --- 
+    // --- 调用原始方法 ---
     // 传入 request 与我们构造的 handlerBlock，完成对通知内容的修改
     %orig(request, handlerBlock);
 }
