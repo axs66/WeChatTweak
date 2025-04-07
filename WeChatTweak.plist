@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+    <key>Filter</key>
+    <array>
+        <dict>
+            <key>Bundles</key>
+            <array>
+                <string>com.tencent.xin</string>        <!-- 微信的 Bundle ID -->
+                <string>com.tencent.qy.xin</string>     <!-- 企业微信的 Bundle ID -->
+                <string>com.tencent.wx</string>         <!-- 可能是其他微信版本的 Bundle ID -->
+                <string>com.tencent.mm.xin</string>     <!-- 微信的另一个版本的 Bundle ID -->
+            </array>
+        </dict>
+    </array>
+</dict>
+</plist>
