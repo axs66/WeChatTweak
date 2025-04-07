@@ -24,29 +24,20 @@
 - (void)didReceiveNotificationRequest:(UNNotificationRequest *)request 
                    withContentHandler:(void (^)(UNNotificationContent *_Nonnull))contentHandler {
     
-    // 原始声音处理（空值保护）
-    NSString *originalSound = request.content.sound ?: @"default";
+    // 原始声音处理
+    NSString *originalSound = request.content.sound;
     
-    // 应用自定义映射规则（带文件存在性验证）
-    NSString *mappedSound = [SoundMapper mapSoundName:originalSound];
-    if (![SoundMapper validateSoundFile:mappedSound]) {
-        mappedSound = originalSound;
-    }
+    // 应用自定义映射规则
+    NSString *mappedSound = [SoundMapper mapSoundName:originalSound] ?: originalSound;
     
-    // 严格符合Logos语法的%orig调用
-    %orig(request, ^(UNNotificationContent *content) {  // ← 第35行起始
+    // 严格符合规范的%orig调用格式
+    %orig(request, ^(UNNotificationContent *content) {  // ← 第37行起始
         @autoreleasepool {
             UNMutableNotificationContent *modifiedContent = [content mutableCopy];
-            
-            // 线程安全的声音设置
-            if (mappedSound) {
-                modifiedContent.sound = [UNNotificationSound soundNamed:mappedSound];
-                NSLog(@"[WeChatTweak] 提示音修改成功 | 原始: %@ → 新: %@", originalSound, mappedSound);
-            }
-            
-            contentHandler([modifiedContent copy]);  // ← 第43行闭合
+            modifiedContent.sound = [UNNotificationSound soundNamed:mappedSound];
+            contentHandler([modifiedContent copy]);  // ← 确保所有括号闭合
         }
-    });  // ← 第45行：严格闭合所有括号
+    });  // ← 第43行：严格闭合所有括号
 }
 
 %end
