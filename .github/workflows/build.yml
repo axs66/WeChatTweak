@@ -14,7 +14,7 @@ jobs:
     runs-on: macos-latest
     timeout-minutes: 20
     env:
-      THEOS: ${{ github.workspace }}/theos  # 关键修改点
+      THEOS: ${{ github.workspace }}/theos
       SDKVERSION: 16.4
 
     steps:
@@ -28,8 +28,16 @@ jobs:
         git clone --filter=blob:none --depth 1 \
           https://github.com/theos/theos.git $THEOS
         $THEOS/bin/update-theos
-        # 安装 Xcode 命令行工具
-        xcode-select --install
+        # 输出 THEOS 目录结构来检查是否正确设置
+        ls -la $THEOS
+        # 安装 Xcode 命令行工具（如果未安装）
+        xcode-select --install || echo "xcode-select already installed"
+        # 显示 xcode-select 安装的工具版本
+        xcode-select -v
+        # 显示当前的 SDK 和开发环境版本
+        sw_vers
+        # 确保可以使用 xcodebuild
+        xcodebuild -version
 
     # 构建 .deb 包
     - name: Build Tweak Package
