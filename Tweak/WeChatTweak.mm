@@ -1,6 +1,7 @@
 #import <UIKit/UIKit.h>
 #import <Foundation/Foundation.h>
 #import <objc/runtime.h>
+#import <objc/message.h>
 
 // 配置管理器接口声明（新增）
 @interface WTConfigManager : NSObject
@@ -13,12 +14,22 @@ static IMP original_CreateNewInstance = NULL;
 
 // 自定义消息撤回拦截逻辑
 static void new_onRevokeMessage(id self, SEL _cmd, id msg) {
-    if (![WTConfigManager isAntiRevokeEnabled]) {  // 修正类方法调用
-        ((void(*)(id, SEL, id))original_onRevokeMessage)(self, _cmd, msg);
-        return;
+    // 动态加载 WTConfigManager 类并检查是否启用防撤回
+    Class wtConfigClass = NSClassFromString(@"WTConfigManager");
+    if (wtConfigClass) {
+        SEL antiRevokeSelector = NSSelectorFromString(@"isAntiRevokeEnabled");
+        if ([wtConfigClass respondsToSelector:antiRevokeSelector]) {
+            BOOL isEnabled = ((BOOL (*)(id, SEL))objc_msgSend)(wtConfigClass, antiRevokeSelector);
+            if (isEnabled) {
+                // 启用防撤回，阻止撤回并高亮显示
+                NSLog(@"[WeChatTweak] 拦截撤回消息: %@", msg);
+                return;
+            }
+        }
     }
-    // 自定义逻辑：阻止撤回并高亮显示
-    NSLog(@"[WeChatTweak] 拦截撤回消息: %@", msg);
+    
+    // 如果未启用防撤回，则执行原始撤回逻辑
+    ((void(*)(id, SEL, id))original_onRevokeMessage)(self, _cmd, msg);
 }
 
 // 自定义微信多开逻辑
