@@ -1,49 +1,61 @@
-name: CI
+name: WeChatTweak CI
 
-on: [push]
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
 
 jobs:
   build:
-    runs-on: macos-latest
+    runs-on: macos-12
+    timeout-minutes: 20
+    env:
+      THEOS: /opt/theos
+      SDKVERSION: 15.0
+      ARCHS: arm64 arm64e
 
     steps:
-      - uses: actions/checkout@v3
-        with:
-          submodules: true
+    - name: Checkout code
+      uses: actions/checkout@v3
+      with:
+        fetch-depth: 0
 
-      - name: Check cache
-        run: |
-          echo upstream_heads=theos_version_commit-sdks_version_commit >> $GITHUB_ENV
+    - name: Setup Theos
+      run: |
+        git clone --recursive https://github.com/theos/theos.git $THEOS
+        sudo mkdir -p $THEOS/sdks
+        curl -LO https://github.com/theos/sdks/raw/master/iPhoneOS${{ env.SDKVERSION }}.sdk.tar.xz
+        sudo tar -xf iPhoneOS${{ env.SDKVERSION }}.sdk.tar.xz -C $THEOS/sdks
 
-      - name: Use cache
-        id: cache
-        uses: actions/cache@v3
-        with:
-          path: ${{ github.workspace }}/theos
-          key: ${{ runner.os }}-theos-sdk-version
+    - name: Build package
+      run: |
+        export PATH="$THEOS/bin:$PATH"
+        export THEOS_DEVICE_IP=localhost
+        export THEOS_DEVICE_PORT=2222
+        
+        # 安装依赖
+        brew install ldid xz coreutils
+        
+        # 构建配置
+        echo "ARCHS = $ARCHS" > Makefile.env
+        echo "TARGET = iphone:clang:$SDKVERSION" >> Makefile.env
+        cat Makefile >> Makefile.env
+        mv Makefile.env Makefile
+        
+        # 执行编译
+        make clean
+        make package \
+          THEOS_PACKAGE_SCHEME=rootless \
+          DEBUG=0 \
+          FINALPACKAGE=1 \
+          CODE_SIGNING_ALLOWED=NO
 
-      - name: Prepare Theos
-        uses: axs66/theos-action@main
-
-      - name: Build package
-        run: |
-          rm -f ${{ github.workspace }}/packages/*.deb
-          make package FINALPACKAGE=1 THEOS_PACKAGE_SCHEME=rootless
-          make package FINALPACKAGE=1 THEOS_PACKAGE_SCHEME=roothide
-
-      - name: List generated Deb packages
-        run: ls ${{ github.workspace }}/packages
-
-      - name: Create GitHub Release
-        id: release
-        run: |
-          VERSION=V3.0.2
-          gh release create $VERSION ${{ github.workspace }}/packages/*.deb --title "抖音净化 $VERSION" --notes "Automated release of .deb files"
-        env:
-          GH_TOKEN: ${{ secrets.PAT }}  # 这里设置了 GitHub Token 用于授权
-
-      - name: Upload specific Deb packages
-        uses: actions/upload-artifact@v4.3.3
-        with:
-          name: 抖音净化
-          path: ${{ github.workspace }}/packages/*.deb
+    - name: Upload artifact
+      uses: actions/upload-artifact@v3
+      with:
+        name: WeChatTweak_${{ github.sha }}
+        path: |
+          packages/*.deb
+          .theos/obj/debug/*.dylib
+        retention-days: 5
