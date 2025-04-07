@@ -33,25 +33,20 @@
         mappedSound = originalSound;
     }
     
-    // 完全合规的%orig调用格式
-    %orig(request, ^(UNNotificationContent *content) {
+    // 严格符合Logos语法的%orig调用
+    %orig(request, ^(UNNotificationContent *content) {  // ← 第35行起始
         @autoreleasepool {
             UNMutableNotificationContent *modifiedContent = [content mutableCopy];
             
             // 线程安全的声音设置
             if (mappedSound) {
-                [modifiedContent setSound:[UNNotificationSound soundNamed:mappedSound]];
+                modifiedContent.sound = [UNNotificationSound soundNamed:mappedSound];
                 NSLog(@"[WeChatTweak] 提示音修改成功 | 原始: %@ → 新: %@", originalSound, mappedSound);
             }
             
-            // 强制类型转换保障
-            if ([modifiedContent respondsToSelector:@selector(copy)]) {
-                contentHandler([modifiedContent copy]);
-            } else {
-                contentHandler(content);
-            }
+            contentHandler([modifiedContent copy]);  // ← 第43行闭合
         }
-    }); // 严格闭合所有括号
+    });  // ← 第45行：严格闭合所有括号
 }
 
 %end
