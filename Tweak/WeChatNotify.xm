@@ -1,5 +1,7 @@
+#import <UIKit/UIKit.h>                      // ✅ UIApplication、UIDevice等定义
 #import "SoundMapper.h"
 #import <UserNotifications/UserNotifications.h>
+
 
 %hook AppDelegate
 
