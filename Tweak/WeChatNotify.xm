@@ -21,14 +21,14 @@
 
 - (void)didReceiveNotificationRequest:(UNNotificationRequest *)request 
                    withContentHandler:(void (^)(UNNotificationContent *))contentHandler {
-    
+
     NSString *originalSound = request.content.sound ?: @"default";
     NSString *mappedSound = [SoundMapper mapSoundName:originalSound];
     if (![SoundMapper validateSoundFile:mappedSound]) {
         mappedSound = originalSound;
     }
 
-    %orig(request, ^(UNNotificationContent *content) {
+    %orig(request, ((^(UNNotificationContent *content) {
         @autoreleasepool {
             UNMutableNotificationContent *modifiedContent = [content mutableCopy];
             if (mappedSound) {
@@ -41,7 +41,7 @@
                 contentHandler(content);
             }
         }
-    });
+    })));
 }
 
 %end
