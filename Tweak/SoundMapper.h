@@ -3,6 +3,6 @@
 @interface SoundMapper : NSObject
 
 + (void)registerDefaultMappings;
-+ (NSString *)mapSoundName:(NSString *)originalName;
++ (nullable NSString *)mapSoundName:(nullable NSString *)originalName;
 
 @end
