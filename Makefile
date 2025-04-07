@@ -33,5 +33,8 @@ WeChatTweak_LIBRARIES = c++
 # 禁用代码签名（适用于 rootless 或测试环境）
 CODESIGNING_ALLOWED = NO
 
+# 添加 Settings.bundle 以便在 .deb 包中包含它
+TWEAK_FILES = $(wildcard Settings.bundle/*)
+
 # 引入 THEOS 的 tweak.mk 文件，用于定义构建规则
 include $(THEOS)/makefiles/tweak.mk
