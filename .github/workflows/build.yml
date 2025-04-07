@@ -3,59 +3,31 @@ name: WeChatTweak CI
 on:
   push:
     branches: [ main ]
-  pull_request:
-    branches: [ main ]
+  workflow_dispatch:  # 允许手动触发
 
 jobs:
   build:
-    runs-on: macos-12
-    timeout-minutes: 20
+    runs-on: macos-latest  # 关键修改点
+    timeout-minutes: 25
     env:
-      THEOS: /opt/theos
-      SDKVERSION: 15.0
-      ARCHS: arm64 arm64e
+      THEOS: ${{ github.workspace }}/theos
 
     steps:
-    - name: Checkout code
-      uses: actions/checkout@v3
-      with:
-        fetch-depth: 0
+    - name: Checkout
+      uses: actions/checkout@v4
 
     - name: Setup Theos
       run: |
-        git clone --recursive https://github.com/theos/theos.git $THEOS
-        sudo mkdir -p $THEOS/sdks
-        curl -LO https://github.com/theos/sdks/raw/master/iPhoneOS${{ env.SDKVERSION }}.sdk.tar.xz
-        sudo tar -xf iPhoneOS${{ env.SDKVERSION }}.sdk.tar.xz -C $THEOS/sdks
+        git clone --depth 1 https://github.com/theos/theos.git $THEOS
+        echo "THEOS=$THEOS" >> $GITHUB_ENV
 
-    - name: Build package
+    - name: Build
       run: |
         export PATH="$THEOS/bin:$PATH"
-        export THEOS_DEVICE_IP=localhost
-        export THEOS_DEVICE_PORT=2222
-        
-        # 安装依赖
-        brew install ldid xz coreutils
-        
-        # 构建配置
-        echo "ARCHS = $ARCHS" > Makefile.env
-        echo "TARGET = iphone:clang:$SDKVERSION" >> Makefile.env
-        cat Makefile >> Makefile.env
-        mv Makefile.env Makefile
-        
-        # 执行编译
-        make clean
-        make package \
-          THEOS_PACKAGE_SCHEME=rootless \
-          DEBUG=0 \
-          FINALPACKAGE=1 \
-          CODE_SIGNING_ALLOWED=NO
-
-    - name: Upload artifact
+        make package DEBUG=0
+      
+    - name: Upload Artifact
       uses: actions/upload-artifact@v3
       with:
-        name: WeChatTweak_${{ github.sha }}
-        path: |
-          packages/*.deb
-          .theos/obj/debug/*.dylib
-        retention-days: 5
+        name: WeChatTweak
+        path: packages/*.deb
