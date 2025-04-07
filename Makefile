@@ -35,6 +35,8 @@ WeChatTweak_LDFLAGS = -Wl,-segalign,4000
 # 框架依赖
 WeChatTweak_FRAMEWORKS = UIKit UserNotifications
 WeChatTweak_PRIVATE_FRAMEWORKS = AppSupport ChatKit
+WeChatTweak_CFLAGS = -fobjc-arc -Wno-deprecated-declarations
+WeChatTweak_LDFLAGS = -Wl,-segalign,4000
 
 # 签名配置 (适用于越狱环境)
 WeChatTweak_CODESIGN_FLAGS = -Sentitlements.plist
