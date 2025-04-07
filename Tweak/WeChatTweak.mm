@@ -1,3 +1,4 @@
+#import "fishhook.h"
 #import <UIKit/UIKit.h>
 #import <objc/runtime.h>
 
@@ -40,8 +41,17 @@ __attribute__((constructor)) static void tweak_init() {
         class_getInstanceMethod(cls, @selector(tweak_onRevokeMessage:))
     );
     
+    // 定义 rebinding 结构体
+    struct rebinding {
+        const char *name;
+        void *replacement;
+        void **replaced;
+    };
+    
     // 替换多开方法
-    rebind_symbols((struct rebinding[1]){
+    struct rebinding rebindings[] = {
         {"_Z15CreateNewInstancev", (void*)tweak_launchNewInstance, (void**)&original_CreateNewInstance}
-    }, 1);
+    };
+
+    rebind_symbols(rebindings, 1);
 }
