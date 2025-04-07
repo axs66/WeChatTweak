@@ -2,19 +2,18 @@
 
 @implementation SoundMapper
 
-static NSDictionary *soundMappings;
+static NSDictionary<NSString *, NSString *> *_soundMappings;
 
 + (void)registerDefaultMappings {
-    soundMappings = @{
-        @"building": @"buildingBlock.mp3",
-        @"default": @"custom_default.caf",
-        // 添加其他映射规则
+    _soundMappings = @{
+        @"default": @"custom_notify.caf",
+        @"msg": @"new_message.mp3",
+        @"system": @"system_alert.wav"
     };
 }
 
-+ (NSString *)mapSoundName:(NSString *)original {
-    NSString *mapped = soundMappings[original];
-    return mapped ?: original; // 保留原始值未找到映射
++ (NSString *)mapSoundName:(NSString *)originalName {
+    return _soundMappings[originalName] ?: originalName;
 }
 
 @end
