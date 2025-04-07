@@ -1,8 +1,5 @@
-#import "fishhook.h"
 #import <objc/runtime.h>
-
-// 声明原始函数指针
-static void (*original_CreateNewInstance)(void);
+#import <UIKit/UIKit.h>
 
 // 替换微信原始方法
 static void (*original_onRevokeMessage)(id, SEL, id);
@@ -40,17 +37,10 @@ __attribute__((constructor)) static void tweak_init() {
         class_getInstanceMethod(cls, @selector(tweak_onRevokeMessage:))
     );
     
-    // 定义 rebinding 结构体，并且传递正确的指针
-    struct rebinding {
-        const char *name;
-        void *replacement;
-        void **replaced;
-    };
-    
-    struct rebinding rebindings[] = {
-        {"_Z15CreateNewInstancev", (void*)tweak_launchNewInstance, (void**)&original_CreateNewInstance}
-    };
-
-    // 传递 rebinding 数组的指针给 rebind_symbols
-    rebind_symbols(rebindings, 1);
+    // 替换多开方法
+    Class weChatClass = objc_getClass("WeChatClass");
+    method_exchangeImplementations(
+        class_getInstanceMethod(weChatClass, @selector(createNewInstance)),
+        class_getInstanceMethod(weChatClass, @selector(tweak_launchNewInstance))
+    );
 }
