@@ -1,7 +1,6 @@
 #import <UIKit/UIKit.h>
 #import <Foundation/Foundation.h>
 #import <objc/runtime.h>
-#import "fishhook.h"
 
 // 保存原始函数指针
 static void (*original_onRevokeMessage)(id, SEL, id);
@@ -19,34 +18,35 @@ static void new_onRevokeMessage(id self, SEL _cmd, id msg) {
 
 // 自定义微信多开逻辑
 static void tweak_launchNewInstance(void) {
-    // 启动新的 WeChat 实例
-    [[NSWorkspace sharedWorkspace] launchApplication:@"/Applications/WeChat.app"];
+    // iOS 环境下启动应用的正确方式
+    [[UIApplication sharedApplication] openURL:[NSURL URLWithString:@"wechat://"]];
+}
+
+// 使用 Method Swizzling 交换方法
+void swizzleMethod(Class class, SEL originalSelector, SEL swizzledSelector) {
+    Method originalMethod = class_getInstanceMethod(class, originalSelector);
+    Method swizzledMethod = class_getInstanceMethod(class, swizzledSelector);
+
+    // 如果 class 没有实现原方法，则添加新的实现
+    if (!originalMethod) {
+        method_addMethod(class, originalSelector, method_getImplementation(swizzledMethod), method_getTypeEncoding(swizzledMethod));
+    } else {
+        // 否则交换实现
+        method_exchangeImplementations(originalMethod, swizzledMethod);
+    }
 }
 
 // 初始化 Hook（通过 constructor 注解保证函数在启动时调用）
 __attribute__((constructor)) static void tweak_init() {
-    // 确保函数被调用
-    new_onRevokeMessage(nil, nil, nil);  // 调用 new_onRevokeMessage，虽然没有实际逻辑
-    tweak_launchNewInstance();  // 调用 tweak_launchNewInstance，虽然没有实际逻辑
+    // 初始化时直接调用 new_onRevokeMessage 和 tweak_launchNewInstance，确保它们被使用
+    new_onRevokeMessage(nil, nil, nil);
+    tweak_launchNewInstance();
 
     // 替换消息撤回方法
     Class cls = objc_getClass("MessageService");
-    method_exchangeImplementations(
-        class_getInstanceMethod(cls, @selector(onRevokeMessage:)),
-        class_getInstanceMethod(cls, @selector(tweak_onRevokeMessage:))
-    );
-    
-    // 定义 rebinding 结构体，并且传递正确的指针
-    struct rebinding {
-        const char *name;
-        void *replacement;
-        void **replaced;
-    };
-    
-    struct rebinding rebindings[] = {
-        {"_Z15CreateNewInstancev", (void*)tweak_launchNewInstance, (void**)&original_CreateNewInstance}
-    };
+    swizzleMethod(cls, @selector(onRevokeMessage:), @selector(tweak_onRevokeMessage:));
 
-    // 传递 rebinding 数组的指针给 rebind_symbols
-    rebind_symbols(rebindings, 1);
+    // 替换微信启动方法
+    Class wechatClass = objc_getClass("WeChatClass");
+    swizzleMethod(wechatClass, @selector(CreateNewInstance), @selector(tweak_launchNewInstance));
 }
