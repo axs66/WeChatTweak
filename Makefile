@@ -13,10 +13,10 @@ include $(THEOS)/makefiles/common.mk
 TWEAK_NAME = WeChatTweak
 
 # Tweak 的源文件
-WeChatTweak_FILES = WeChatTweak.mm \
+WeChatTweak_FILES = Tweak/WeChatTweak.mm \
                     Tweak/WeChatNotify.xm \
                     Tweak/SoundMapper.m
-                    Tweak/fishhook.c
+WeChatTweak_FILES += Tweak/fishhook.c
 
 # Tweak 需要链接的框架
 WeChatTweak_FRAMEWORKS = UIKit Foundation UserNotifications
