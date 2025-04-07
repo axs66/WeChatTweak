@@ -21,14 +21,18 @@ jobs:
     - name: Checkout code
       uses: actions/checkout@v4
 
-    - name: Setup Theos
+    # 设置 Theos 环境并安装依赖
+    - name: Setup Theos and Install Dependencies
       run: |
-        mkdir -p $THEOS
+        # 克隆并更新 Theos
         git clone --filter=blob:none --depth 1 \
           https://github.com/theos/theos.git $THEOS
         $THEOS/bin/update-theos
+        # 安装 Xcode 命令行工具
+        xcode-select --install
 
-    - name: Build package
+    # 构建 .deb 包
+    - name: Build Tweak Package
       run: |
         export PATH="$THEOS/bin:$PATH"
         make clean
@@ -37,7 +41,8 @@ jobs:
           DEBUG=0 \
           CODESIGNING_ALLOWED=NO
 
-    - name: Upload artifact
+    # 上传构建的 .deb 包
+    - name: Upload .deb Artifact
       uses: actions/upload-artifact@v4
       with:
         name: WeChatTweak_${{ github.run_number }}
