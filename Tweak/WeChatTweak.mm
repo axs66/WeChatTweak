@@ -10,10 +10,11 @@
 
 // 保存原始函数指针
 static void (*original_onRevokeMessage)(id, SEL, id);
-static IMP original_CreateNewInstance = NULL;
+// 标记为未使用，防止警告
+static IMP original_CreateNewInstance __attribute__((unused)) = NULL;
 
 // 自定义消息撤回拦截逻辑
-static void new_onRevokeMessage(id self, SEL _cmd, id msg) {
+static void new_onRevokeMessage(id self, SEL _cmd, id msg) __attribute__((unused)) {  // 标记为未使用
     // 动态加载 WTConfigManager 类并检查是否启用防撤回
     Class wtConfigClass = NSClassFromString(@"WTConfigManager");
     if (wtConfigClass) {
@@ -33,7 +34,7 @@ static void new_onRevokeMessage(id self, SEL _cmd, id msg) {
 }
 
 // 自定义微信多开逻辑
-static void tweak_launchNewInstance(void) {
+static void tweak_launchNewInstance(void) __attribute__((unused)) {  // 标记为未使用
     // 安全的URL打开方式
     NSURL *url = [NSURL URLWithString:@"wechat://"];
     if ([[UIApplication sharedApplication] canOpenURL:url]) {
