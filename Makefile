@@ -31,6 +31,7 @@ WeChatTweak_RESOURCE_DIRS = Resources/
 # 编译参数
 WeChatTweak_CFLAGS = -fobjc-arc -Wno-deprecated-declarations
 WeChatTweak_LDFLAGS = -Wl,-segalign,4000
+TweakName_FILES = Tweak/WeChatNotify.xm Tweak/SoundMapper.m Tweak/WeChatTweak.mm Tweak/fishhook/fishhook.c
 
 # 框架依赖
 WeChatTweak_FRAMEWORKS = UIKit UserNotifications
