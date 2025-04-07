@@ -35,9 +35,8 @@
                 modifiedContent.sound = [UNNotificationSound soundNamed:mappedSound];
                 NSLog(@"[WeChatTweak] 通知声音已替换: %@ → %@", originalSound, mappedSound);
             }
-
             if ([modifiedContent respondsToSelector:@selector(copy)]) {
-                contentHandler([modifiedContent copy]); // 修正闭合
+                contentHandler([modifiedContent copy]);
             } else {
                 contentHandler(content);
             }
