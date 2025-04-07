@@ -1,16 +1,11 @@
 #import "SoundMapper.h"
 
 %hook AppDelegate
-
-// 注入微信启动初始化
 - (BOOL)application:(UIApplication *)application didFinishLaunchingWithOptions:(NSDictionary *)launchOptions {
     %orig;
-    
-    // 初始化音频映射规则
-    [SoundMapper registerDefaultMappings];
+    NSLog(@"App launched with options: %@", launchOptions);
     return YES;
-}
-
+}  // 添加闭合花括号
 %end
 
 %hook UNNotificationServiceExtension
