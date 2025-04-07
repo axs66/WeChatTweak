@@ -32,23 +32,17 @@
     NSString *mappedSound = [SoundMapper mapSoundName:originalSound] ?: originalSound;
     
     // 关键修复点：补全方法调用括号
-    %orig(request, ^(UNNotificationContent *content) {
-        // 修改通知内容
+    %orig(request, ^(UNNotificationContent *content) {  // ← 第35行补全括号
         UNMutableNotificationContent *modifiedContent = [content mutableCopy];
         
-        // 设置自定义提示音（增加文件存在性校验）
-        if (mappedSound && [SoundMapper validateSoundFile:mappedSound]) {
+        // 设置自定义提示音
+        if (mappedSound) {
             modifiedContent.sound = [UNNotificationSound soundNamed:mappedSound];
-            
-            NSLog(@"[WeChatTweak] 提示音已修改: %@ -> %@", 
-                  originalSound, 
-                  mappedSound);
-        } else {
-            NSLog(@"[WeChatTweak] 使用默认提示音: %@", originalSound);
+            NSLog(@"[WeChatTweak] 提示音已修改: %@ -> %@", originalSound, mappedSound);
         }
         
-        contentHandler([modifiedContent copy]); // 保证线程安全
-    }); // 补全方法调用闭合括号
+        contentHandler([modifiedContent copy]);
+    });  // ← 补全方法调用闭合括号
 }
 
 %end
