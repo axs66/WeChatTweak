@@ -54,5 +54,5 @@ __attribute__((constructor)) static void tweak_init() {
     };
 
     // 传递 rebinding 数组的指针给 rebind_symbols
-    rebind_symbols(rebindings, 1);
+    rebind_symbols(rebindings, 1);  // 正确的参数：传递 rebindings 数组的指针
 }
