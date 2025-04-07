@@ -57,4 +57,11 @@ static NSBundle *_resourceBundle; // 添加资源包引用
     return nil;
 }
 
++ (BOOL)validateSoundFile:(NSString *)fileName {
+    NSString *path = [[NSBundle mainBundle] pathForResource:fileName 
+                                                    ofType:nil 
+                                               inDirectory:@"Sounds"];
+    return (path != nil);
+}
+
 @end
