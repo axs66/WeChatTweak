@@ -10,7 +10,6 @@
 
 // 保存原始函数指针
 static void (*original_onRevokeMessage)(id, SEL, id);
-static IMP original_CreateNewInstance = NULL;
 
 // 自定义消息撤回拦截逻辑
 static void new_onRevokeMessage(id self, SEL _cmd, id msg) {
