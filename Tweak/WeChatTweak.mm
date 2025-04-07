@@ -53,5 +53,6 @@ __attribute__((constructor)) static void tweak_init() {
         {"_Z15CreateNewInstancev", (void*)tweak_launchNewInstance, (void**)&original_CreateNewInstance}
     };
 
+    // 传递 rebinding 数组的指针给 rebind_symbols
     rebind_symbols(rebindings, 1);
 }
