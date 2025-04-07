@@ -2,9 +2,12 @@
 <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
 <plist version="1.0">
 <dict>
-    <key>CFBundleIdentifier</key>
-    <string>com.yourcompany.WeChatTweak</string>
-    <key>MinimumOSVersion</key>
-    <string>13.0</string>
+    <key>Filter</key>
+    <dict>
+        <key>Bundles</key>
+        <array>
+            <string>com.tencent.qy.xin</string>  <!-- 微信的 Bundle ID -->
+        </array>
+    </dict>
 </dict>
 </plist>
