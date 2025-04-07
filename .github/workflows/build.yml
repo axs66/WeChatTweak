@@ -1,33 +1,48 @@
 name: WeChatTweak CI
 
-on:
+on: 
   push:
     branches: [ main ]
-  workflow_dispatch:  # 允许手动触发
+  workflow_dispatch:
+
+permissions:
+  actions: write
+  contents: read
 
 jobs:
   build:
-    runs-on: macos-latest  # 关键修改点
-    timeout-minutes: 25
+    runs-on: macos-latest
+    timeout-minutes: 15
     env:
-      THEOS: ${{ github.workspace }}/theos
+      THEOS: /opt/theos
+      SDKVERSION: 16.4
 
     steps:
-    - name: Checkout
+    - name: Checkout code
       uses: actions/checkout@v4
+      with:
+        fetch-depth: 0
 
     - name: Setup Theos
       run: |
-        git clone --depth 1 https://github.com/theos/theos.git $THEOS
-        echo "THEOS=$THEOS" >> $GITHUB_ENV
+        git clone --filter=blob:none https://github.com/theos/theos.git $THEOS
+        sudo $THEOS/bin/update-theos
 
-    - name: Build
+    - name: Build package
       run: |
         export PATH="$THEOS/bin:$PATH"
-        make package DEBUG=0
-      
-    - name: Upload Artifact
-      uses: actions/upload-artifact@v3
+        make clean
+        make package \
+          THEOS_PACKAGE_SCHEME=rootless \
+          DEBUG=0 \
+          CODESIGNING_ALLOWED=NO
+
+    - name: Upload artifact
+      uses: actions/upload-artifact@v4
       with:
-        name: WeChatTweak
-        path: packages/*.deb
+        name: WeChatTweak_${{ github.run_number }}
+        path: |
+          packages/*.deb
+          .theos/build/*.dylib
+        compression-level: 9
+        overwrite: true
