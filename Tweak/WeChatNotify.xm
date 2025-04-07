@@ -28,7 +28,6 @@
         mappedSound = originalSound;
     }
 
-    // 调用原始方法
     %orig(request, ^(UNNotificationContent *content) {
         @autoreleasepool {
             UNMutableNotificationContent *modifiedContent = [content mutableCopy];
@@ -37,9 +36,8 @@
                 NSLog(@"[WeChatTweak] 通知声音已替换: %@ → %@", originalSound, mappedSound);
             }
 
-            // 确保调用正确的 contentHandler
             if ([modifiedContent respondsToSelector:@selector(copy)]) {
-                contentHandler([modifiedContent copy]);
+                contentHandler([modifiedContent copy]); // 修正闭合
             } else {
                 contentHandler(content);
             }
