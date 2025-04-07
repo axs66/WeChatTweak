@@ -18,8 +18,10 @@ static void new_onRevokeMessage(id self, SEL _cmd, id msg) {
 
 // 自定义微信多开逻辑
 static void tweak_launchNewInstance(void) {
-    // iOS 环境下启动应用的正确方式
-    [[UIApplication sharedApplication] openURL:[NSURL URLWithString:@"wechat://"]];
+    // iOS 环境下启动应用的正确方式（替代了 deprecated 方法）
+    [[UIApplication sharedApplication] openURL:[NSURL URLWithString:@"wechat://"]
+                                         options:@{}
+                               completionHandler:nil];
 }
 
 // 使用 Method Swizzling 交换方法
