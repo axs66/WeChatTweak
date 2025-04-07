@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<plist version="1.0">
+<dict>
+    <key>PreferenceSpecifiers</key>
+    <array>
+        <dict>
+            <key>Type</key>
+            <string>PSGroupSpecifier</string>
+            <key>Title</key>
+            <string>WeChatTweak 设置</string>
+        </dict>
+        
+        <!-- 插件开关：启用/禁用插件功能 -->
+        <dict>
+            <key>Type</key>
+            <string>PSSwitchSpecifier</string>
+            <key>Title</key>
+            <string>启用多开功能</string>
+            <key>Key</key>
+            <string>enableMultiAccount</string>
+            <key>DefaultValue</key>
+            <true/>
+        </dict>
+        
+        <!-- 消息撤回拦截功能开关 -->
+        <dict>
+            <key>Type</key>
+            <string>PSSwitchSpecifier</string>
+            <key>Title</key>
+            <string>启用消息撤回拦截</string>
+            <key>Key</key>
+            <string>enableMessageRevoke</string>
+            <key>DefaultValue</key>
+            <true/>
+        </dict>
+        
+        <!-- 其他功能的设置项 -->
+    </array>
+</dict>
+</plist>
