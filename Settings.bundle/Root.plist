@@ -3,6 +3,7 @@
 <dict>
     <key>PreferenceSpecifiers</key>
     <array>
+        <!-- 设置分组标题 -->
         <dict>
             <key>Type</key>
             <string>PSGroupSpecifier</string>
@@ -10,7 +11,7 @@
             <string>WeChatTweak 设置</string>
         </dict>
         
-        <!-- 插件开关：启用/禁用插件功能 -->
+        <!-- 多开功能启用/禁用 -->
         <dict>
             <key>Type</key>
             <string>PSSwitchSpecifier</string>
@@ -22,7 +23,7 @@
             <true/>
         </dict>
         
-        <!-- 消息撤回拦截功能开关 -->
+        <!-- 消息撤回拦截启用/禁用 -->
         <dict>
             <key>Type</key>
             <string>PSSwitchSpecifier</string>
@@ -33,8 +34,18 @@
             <key>DefaultValue</key>
             <true/>
         </dict>
-        
-        <!-- 其他功能的设置项 -->
+
+        <!-- 无后台消息显示详情 -->
+        <dict>
+            <key>Type</key>
+            <string>PSSwitchSpecifier</string>
+            <key>Title</key>
+            <string>启用无后台消息显示详情</string>
+            <key>Key</key>
+            <string>enableNoBackgroundMessageDetails</string>
+            <key>DefaultValue</key>
+            <true/>
+        </dict>
     </array>
 </dict>
 </plist>
