@@ -1,7 +1,7 @@
 #import <UIKit/UIKit.h>
 #import <Foundation/Foundation.h>
 #import <objc/runtime.h>
-#import <objc/message.h>  // 需要包含此头文件以支持 objc_msgSend
+#import <objc/message.h>
 
 // 配置管理器接口声明（新增）
 @interface WTConfigManager : NSObject
@@ -10,13 +10,11 @@
 
 // 保存原始函数指针
 static void (*original_onRevokeMessage)(id, SEL, id);
-static IMP original_CreateNewInstance = NULL;
+static IMP original_CreateNewInstance __attribute__((unused)) = NULL; // 移到声明上
 
 // 自定义消息撤回拦截逻辑
 static void new_onRevokeMessage(id self, SEL _cmd, id msg) {
-    // 标记未使用的函数
-    #pragma unused(new_onRevokeMessage)
-    
+    // 保留此函数以供使用
     // 动态加载 WTConfigManager 类并检查是否启用防撤回
     Class wtConfigClass = NSClassFromString(@"WTConfigManager");
     if (wtConfigClass) {
@@ -37,9 +35,7 @@ static void new_onRevokeMessage(id self, SEL _cmd, id msg) {
 
 // 自定义微信多开逻辑
 static void tweak_launchNewInstance(void) {
-    // 标记未使用的函数
-    #pragma unused(tweak_launchNewInstance)
-    
+    // 保留此函数以供使用
     // 安全的URL打开方式
     NSURL *url = [NSURL URLWithString:@"wechat://"];
     if ([[UIApplication sharedApplication] canOpenURL:url]) {
