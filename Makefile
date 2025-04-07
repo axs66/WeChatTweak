@@ -1,13 +1,31 @@
-TARGET := iphone:clang:latest:10.0
-INSTALL_TARGET_PROCESSES = WeChat
+# Makefile for WeChatTweak
 
+# 构建的架构
+ARCHS = arm64
+
+# 设置目标平台为 iPhone，使用最新的 Clang 编译器
+TARGET = iphone:clang:latest:latest
+
+# 引入 THEOS 公共 makefile 配置
+include $(THEOS)/makefiles/common.mk
+
+# 定义 Tweak 名称
 TWEAK_NAME = WeChatTweak
 
-WeChatTweak_FILES = Tweak/WeChatTweak.mm Tweak/WeChatNotify.xm Tweak/SoundMapper.m
+# Tweak 的源文件
+WeChatTweak_FILES = WeChatTweak.mm \
+                    Tweak/WeChatNotify.xm \
+                    Tweak/SoundMapper.m
 WeChatTweak_FILES += Tweak/fishhook.c
-WeChatTweak_FRAMEWORKS = Foundation UIKit UserNotifications
-WeChatTweak_PRIVATE_FRAMEWORKS = AppSupport
-WeChatTweak_LDFLAGS += -lobjc -lc++
-WeChatTweak_CFLAGS += -std=c++17
 
-include $(THEOS_MAKE_PATH)/tweak.mk
+# Tweak 需要链接的框架
+WeChatTweak_FRAMEWORKS = UIKit Foundation UserNotifications
+
+# 私有框架，如果有需要，可以加入
+WeChatTweak_PRIVATE_FRAMEWORKS = SpringBoardServices
+
+# 使用的库（如果需要）
+WeChatTweak_LIBRARIES = c++
+
+# 引入 THEOS 的 tweak.mk 文件
+include $(THEOS)/makefiles/tweak.mk
