@@ -1,49 +1,44 @@
+#import <UIKit/UIKit.h>
 #import <objc/runtime.h>
-#import <Foundation/Foundation.h>
-#import "fishhook.h"
 
-// 撤回消息拦截
-static void (*original_onRevokeMessage)(id, SEL, id) = NULL;
+// 替换微信原始方法
+static void (*original_onRevokeMessage)(id, SEL, id);
 static void new_onRevokeMessage(id self, SEL _cmd, id msg) {
-    if (![NSClassFromString(@"WTConfigManager") isAntiRevokeEnabled]) {
-        original_onRevokeMessage(self, _cmd, msg);
+    // 获取 WTConfigManager 并检查是否启用反撤回功能
+    id configManagerClass = NSClassFromString(@"WTConfigManager");
+    SEL isAntiRevokeSelector = NSSelectorFromString(@"isAntiRevokeEnabled");
+    if ([configManagerClass respondsToSelector:isAntiRevokeSelector]) {
+        if (![configManagerClass performSelector:isAntiRevokeSelector]) {
+            original_onRevokeMessage(self, _cmd, msg);  // 调用原撤回逻辑
+            return;
+        }
+    } else {
+        original_onRevokeMessage(self, _cmd, msg);  // 如果没有该方法，则执行原逻辑
         return;
     }
-    NSLog(@"[WeChatTweak] 拦截撤回消息: %@", msg);
+    
+    // 自定义逻辑：阻止撤回并高亮显示
+    NSLog(@"拦截撤回消息: %@", msg);
 }
 
-// 退群提醒逻辑（假设类名为 GroupManager）
-static void (*original_removeMember)(id, SEL, id, id) = NULL;
-static void new_removeMember(id self, SEL _cmd, id group, id user) {
-    NSLog(@"[WeChatTweak] 成员 %@ 被移出群组 %@", user, group);
-    original_removeMember(self, _cmd, group, user);
+// 多开逻辑
+static void tweak_launchNewInstance(id self, SEL _cmd) {
+    // iOS 上的启动方式
+    UIApplication *app = [UIApplication sharedApplication];
+    [app openURL:[NSURL URLWithString:@"wechat://"] options:@{} completionHandler:nil];
 }
 
-// 微信多开（fishhook 替换符号）
-static void tweak_launchNewInstance(void) {
-    NSLog(@"[WeChatTweak] 执行多开");
-    [[NSWorkspace sharedWorkspace] launchApplication:@"/Applications/WeChat.app"];
-}
-
-// fishhook 替换符号存储
-static void (*original_CreateNewInstance)(void);
-
-// 初始化
+// 初始化 Hook
 __attribute__((constructor)) static void tweak_init() {
-    // Hook 撤回消息
-    Class messageService = objc_getClass("MessageService");
-    Method orig = class_getInstanceMethod(messageService, @selector(onRevokeMessage:));
-    original_onRevokeMessage = reinterpret_cast<void (*)(id, SEL, id)>(method_getImplementation(orig));
-    method_setImplementation(orig, (IMP)new_onRevokeMessage);
-
-    // Hook 退群提醒（仅作示例，需确认真实类名/方法）
-    Class groupMgr = objc_getClass("GroupManager");
-    Method removeM = class_getInstanceMethod(groupMgr, @selector(removeMember:fromGroup:));
-    original_removeMember = reinterpret_cast<void (*)(id, SEL, id, id)>(method_getImplementation(removeM));
-    method_setImplementation(removeM, (IMP)new_removeMember);
-
-    // 替换微信多开方法
+    // 替换消息撤回方法
+    Class cls = objc_getClass("MessageService");
+    method_exchangeImplementations(
+        class_getInstanceMethod(cls, @selector(onRevokeMessage:)),
+        class_getInstanceMethod(cls, @selector(tweak_onRevokeMessage:))
+    );
+    
+    // 替换多开方法
     rebind_symbols((struct rebinding[1]){
-        {"_Z15CreateNewInstancev", (void *)tweak_launchNewInstance, (void **)&original_CreateNewInstance}
+        {"_Z15CreateNewInstancev", (void*)tweak_launchNewInstance, (void**)&original_CreateNewInstance}
     }, 1);
 }
