@@ -16,7 +16,7 @@ TWEAK_NAME = WeChatTweak
 WeChatTweak_FILES = WeChatTweak.mm \
                     Tweak/WeChatNotify.xm \
                     Tweak/SoundMapper.m
-WeChatTweak_FILES += Tweak/fishhook.c
+                    Tweak/fishhook.c
 
 # Tweak 需要链接的框架
 WeChatTweak_FRAMEWORKS = UIKit Foundation UserNotifications
