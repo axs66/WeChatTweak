@@ -39,6 +39,9 @@ jobs:
         # 确保可以使用 xcodebuild
         xcodebuild -version
 
+        # 安装 ldid 工具
+        brew install ldid || echo "ldid is already installed"
+
     # 构建 .deb 包
     - name: Build Tweak Package
       run: |
