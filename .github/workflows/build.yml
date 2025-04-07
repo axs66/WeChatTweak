@@ -1,39 +1,49 @@
-name: Build dylib
-on: [push, workflow_dispatch]
+name: CI
+
+on: [push]
 
 jobs:
   build:
-    runs-on: [macos-latest, macos-13]  # 多备选运行器
-    timeout-minutes: 30                 # 避免无限等待
+    runs-on: macos-latest
+
     steps:
-      - uses: actions/checkout@v4
-
-      - name: Install dependencies
-        run: |
-          # 安装 Xcode 命令行工具
-          xcode-select --install || true
-          
-          # 安装 Homebrew 和 ldid
-          /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
-          echo 'export PATH="/usr/local/bin:$PATH"' >> ~/.bashrc
-          source ~/.bashrc
-          brew install ldid
-
-          # 安装 theos
-          git clone --recursive https://github.com/theos/theos.git ~/theos
-          echo "export THEOS=~/theos" >> ~/.bashrc
-          echo "export PATH=$PATH:~/theos/bin" >> ~/.bashrc
-
-      - name: Build tweak
-        run: |
-          source ~/.bashrc
-          cd $GITHUB_WORKSPACE
-          make package
-
-      - name: Upload artifact
-        uses: actions/upload-artifact@v4
+      - uses: actions/checkout@v3
         with:
-          name: WeChatTweak
-          path: |
-            .theos/obj/debug/*.dylib
-            .theos/obj/debug/*.deb
+          submodules: true
+
+      - name: Check cache
+        run: |
+          echo upstream_heads=theos_version_commit-sdks_version_commit >> $GITHUB_ENV
+
+      - name: Use cache
+        id: cache
+        uses: actions/cache@v3
+        with:
+          path: ${{ github.workspace }}/theos
+          key: ${{ runner.os }}-theos-sdk-version
+
+      - name: Prepare Theos
+        uses: axs66/theos-action@main
+
+      - name: Build package
+        run: |
+          rm -f ${{ github.workspace }}/packages/*.deb
+          make package FINALPACKAGE=1 THEOS_PACKAGE_SCHEME=rootless
+          make package FINALPACKAGE=1 THEOS_PACKAGE_SCHEME=roothide
+
+      - name: List generated Deb packages
+        run: ls ${{ github.workspace }}/packages
+
+      - name: Create GitHub Release
+        id: release
+        run: |
+          VERSION=V3.0.2
+          gh release create $VERSION ${{ github.workspace }}/packages/*.deb --title "抖音净化 $VERSION" --notes "Automated release of .deb files"
+        env:
+          GH_TOKEN: ${{ secrets.PAT }}  # 这里设置了 GitHub Token 用于授权
+
+      - name: Upload specific Deb packages
+        uses: actions/upload-artifact@v4.3.3
+        with:
+          name: 抖音净化
+          path: ${{ github.workspace }}/packages/*.deb
