@@ -1,6 +1,9 @@
 #import <UIKit/UIKit.h>
 #import <objc/runtime.h>
 
+// 声明原始函数指针
+static void (*original_CreateNewInstance)(void);
+
 // 替换微信原始方法
 static void (*original_onRevokeMessage)(id, SEL, id);
 static void new_onRevokeMessage(id self, SEL _cmd, id msg) {
@@ -22,7 +25,7 @@ static void new_onRevokeMessage(id self, SEL _cmd, id msg) {
 }
 
 // 多开逻辑
-static void tweak_launchNewInstance(id self, SEL _cmd) {
+static void tweak_launchNewInstance(void) {
     // iOS 上的启动方式
     UIApplication *app = [UIApplication sharedApplication];
     [app openURL:[NSURL URLWithString:@"wechat://"] options:@{} completionHandler:nil];
